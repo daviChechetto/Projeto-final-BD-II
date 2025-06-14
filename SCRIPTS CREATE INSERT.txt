@@ -185,3 +185,24 @@ INSERT INTO Historicos (id_perfil, id_conteudo, id_episodio, progresso_seg) VALU
 (8, 2, NULL, 300), -- Juliana começou a ver Pulp Fiction
 (9, 9, 5, 2460),  -- Rick assistiu ao ep 5 de Arcane (completo)
 (10, 6, NULL, 4170);-- Bia assistiu metade de Clube da Luta
+
+
+SCRIPTS DE INDEXAÇÂO
+
+CREATE INDEX idx_usuarios_id_plano ON Usuarios(id_plano);
+
+CREATE INDEX idx_perfis_id_usuario ON Perfis(id_usuario);
+
+CREATE INDEX idx_conteudo_genero_id_genero ON Conteudo_Genero(id_genero);
+
+CREATE INDEX idx_episodios_id_conteudo ON Episodios(id_conteudo);
+
+CREATE INDEX idx_minha_lista_id_perfil ON Minha_Lista(id_perfil);
+
+CREATE INDEX idx_historicos_id_perfil ON Historicos(id_perfil);
+CREATE INDEX idx_historicos_id_conteudo ON Historicos(id_conteudo);
+
+
+
+
+
