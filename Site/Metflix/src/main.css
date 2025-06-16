@@ -1,0 +1,341 @@
+/* ============================================== */
+/* === STYLESHEET GERAL - TEMA DARK ROXO VÍVIDO === */
+/* ============================================== */
+
+/* --- Variáveis de Cor e Fontes --- */
+:root {
+  --background-primary: #101014; /* Quase preto */
+  --background-secondary: #1C1C21; /* Um pouco mais claro, para cards e modais */
+  --primary-purple: #8A2BE2; /* Roxo azulado, elegante */
+  --vivid-accent: #BF40BF; /* Orquídea, para highlights e hovers */
+  --text-primary: #F5F5F5; /* Branco suave */
+  --text-secondary: #A9A9A9; /* Cinza claro, para textos de apoio */
+  --danger-red: #E50914; /* Vermelho Netflix para erros e exclusão */
+}
+
+/* --- Estilos Globais e Reset --- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--background-primary);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-bottom: 1rem;
+  letter-spacing: 0.5px;
+}
+
+a {
+  color: var(--vivid-accent);
+  text-decoration: none;
+  transition: color 0.2s ease-in-out;
+}
+
+a:hover {
+  color: var(--primary-purple);
+}
+
+
+/* --- Estilo da Barra de Rolagem --- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background-secondary);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--primary-purple);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--vivid-accent);
+}
+
+/* ============================ */
+/* === ESTILOS DE COMPONENTES === */
+/* ============================ */
+
+/* --- Formulários (Login, Register) --- */
+.form-container {
+  max-width: 450px;
+  margin: 0 auto;
+  padding: 60px;
+  background-color: rgba(0, 0, 0, 0.75);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-container h1 {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.form-input, .form-select {
+  background: #333;
+  border-radius: 4px;
+  border: 0;
+  color: var(--text-primary);
+  height: 50px;
+  line-height: 50px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  width: 100%;
+  font-size: 1rem;
+  outline: none;
+  transition: border 0.2s;
+  border: 2px solid transparent;
+}
+
+.form-input:focus, .form-select:focus {
+  border: 2px solid var(--vivid-accent);
+}
+
+.form-button {
+  background: var(--primary-purple);
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 700;
+  margin: 24px 0 12px;
+  padding: 16px;
+  width: 100%;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.form-button:hover {
+  background: var(--vivid-accent);
+}
+
+.error-message {
+  color: var(--danger-red);
+  margin-bottom: 10px;
+}
+
+/* --- Spinner --- */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.spinner {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: var(--vivid-accent);
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin: 50px auto;
+}
+
+/* --- ContentRow e ContentCard --- */
+.content-row {
+  margin-bottom: 40px;
+}
+
+.content-row h2 {
+  font-size: 1.4rem;
+  margin-left: 5px;
+}
+
+.row-container {
+  display: flex;
+  overflow-y: hidden;
+  overflow-x: auto;
+  padding: 20px 5px;
+  /* Escondendo a barra de rolagem mas mantendo a funcionalidade */
+  scrollbar-width: none; /* Firefox */
+}
+.row-container::-webkit-scrollbar {
+  display: none; /* Safari e Chrome */
+}
+
+.card {
+  position: relative;
+  min-width: 180px;
+  width: 180px;
+  margin: 0 5px;
+  background-color: var(--background-secondary);
+  border-radius: 4px;
+  transition: transform 0.25s ease, z-index 0.25s ease;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: scale(1.1);
+  z-index: 10;
+}
+
+.card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.card h4 {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px 10px 10px;
+  margin: 0;
+  font-size: 0.9rem;
+  background-image: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+}
+
+
+/* --- Admin Controls --- */
+.admin-controls button {
+    position: absolute;
+    top: 8px;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.card:hover .admin-controls button {
+    opacity: 1;
+}
+
+.admin-edit-btn {
+    right: 55px;
+    background-color: #007bff;
+}
+
+.admin-delete-btn {
+    right: 8px;
+    background-color: var(--danger-red);
+}
+
+/* ====================== */
+/* === ESTILOS DE PÁGINAS === */
+/* ====================== */
+
+/* --- Profile Select Page --- */
+.profile-select-container {
+    text-align: center;
+    padding-top: 10vh;
+}
+.profile-select-container h1 {
+    font-size: 3.5rem;
+    font-weight: 500;
+}
+.profiles-grid {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 50px;
+}
+.profile-card {
+    cursor: pointer;
+    width: 180px;
+    text-align: center;
+}
+.profile-card img {
+    width: 180px;
+    height: 180px;
+    border-radius: 8px;
+    border: 4px solid transparent;
+    transition: border-color 0.2s;
+}
+.profile-card:hover img {
+    border-color: var(--vivid-accent);
+}
+.profile-card h2 {
+    color: var(--text-secondary);
+    margin-top: 1rem;
+    font-size: 1.3rem;
+    transition: color 0.2s;
+}
+.profile-card:hover h2 {
+    color: var(--text-primary);
+}
+
+/* --- Browse Page --- */
+.browse-page {
+  padding: 0 4%; /* Padding lateral responsivo */
+}
+
+.hero-section {
+  height: 56.25vw; /* Proporção 16:9 */
+  max-height: 80vh;
+  background-size: cover;
+  background-position: center center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 4%;
+}
+
+/* Gradiente para escurecer a imagem de fundo e legibilidade do texto */
+.hero-section::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to right, rgba(16, 16, 20, 1) 10%, rgba(16, 16, 20, 0) 90%);
+}
+
+.hero-content {
+  z-index: 1;
+  width: 50%;
+  max-width: 600px;
+}
+
+.hero-content h1 {
+  font-size: 3.5rem;
+}
+.hero-content p {
+  font-size: 1.2rem;
+  line-height: 1.5;
+}
+
+/* --- Player Page --- */
+.player-back-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: rgba(0,0,0,0.5);
+    color: white;
+    border: 1px solid white;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 2rem;
+    cursor: pointer;
+    z-index: 20;
+    transition: background-color 0.2s;
+}
+.player-back-button:hover {
+  background: rgba(0,0,0,0.8);
+}
+
+.player-wrapper video {
+  width: 100%;
+  height: 100vh;
+  object-fit: contain; /* Para não cortar o vídeo */
+  background: black;
+}

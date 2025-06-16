@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "react-router-dom": "^7.6.2",
+    "react-toastify": "^11.0.5",
+    "sql.js": "^1.13.0",
+    "sqlite3": "^5.1.7"
+  }
+}
