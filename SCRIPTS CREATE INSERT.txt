@@ -16,7 +16,8 @@ CREATE TABLE Usuarios (
     status VARCHAR(50) DEFAULT 'active',
     data_criado TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     data_modificado TIMESTAMP WITH TIME ZONE,
-    CONSTRAINT fk_plano FOREIGN KEY(id_plano) REFERENCES Planos(id_plano)
+    CONSTRAINT fk_plano FOREIGN KEY(id_plano) REFERENCES Planos(id_plano),
+    is_admin boolean
 );
 
 CREATE TABLE Perfis (
