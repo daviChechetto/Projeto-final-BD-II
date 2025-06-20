@@ -1,0 +1,118 @@
+.loginContainer {
+  background-color: var(--cor-secundaria);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+  border: 1px solid var(--cor-borda);
+  margin-left: 20px; /* Adicionado para centralizar quando max-width é atingido em telas maiores */
+  margin-right: 20px; /* Adicionado para centralizar quando max-width é atingido em telas maiores */
+}
+
+.title {
+  font-size: 2.2rem;
+  color: var(--cor-texto-primario);
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: var(--cor-texto-secundario);
+  margin-bottom: 30px;
+}
+
+.loginForm {
+  display: flex;
+  flex-direction: column;
+}
+
+.inputGroup {
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--cor-texto-primario);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Assumindo que os estilos de input vêm de global.css e já são responsivos (width: 100%) */
+
+.loginButton {
+  margin-top: 10px;
+  padding: 14px 20px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  width: 100%; /* Garante que o botão ocupe toda a largura do formulário */
+  /* Herda outros estilos de botão do global.css */
+}
+
+.errorMessage {
+  color: var(--cor-erro);
+  background-color: rgba(220, 53, 69, 0.1);
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  border: 1px solid var(--cor-erro);
+  text-align: left;
+}
+
+.linksContainer {
+  margin-top: 25px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap; /* Permite que os links quebrem a linha se não houver espaço */
+  gap: 10px; /* Espaçamento entre os links caso quebrem a linha */
+  font-size: 0.9rem;
+}
+
+.link {
+  color: var(--cor-pastel);
+  transition: color 0.3s ease;
+  flex-grow: 1; /* Permite que os links cresçam para preencher o espaço, se necessário */
+  text-align: center; /* Centraliza o texto do link se eles tiverem larguras diferentes */
+}
+.link:only-child {
+    flex-grow: 0; /* Se houver apenas um link, não o estica */
+    width: 100%;
+}
+
+
+.link:hover {
+  color: var(--cor-pastel-hover);
+}
+
+/* Responsividade */
+@media (max-width: 480px) {
+  .loginContainer {
+    padding: 30px 20px; /* Ajustado padding lateral */
+    margin: 20px auto; /* Mantém margem e centraliza */
+    max-width: calc(100% - 40px); /* Garante que haja margem nas laterais */
+  }
+
+  .title {
+    font-size: 1.8rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
+  .linksContainer {
+    flex-direction: column; /* Links um abaixo do outro */
+    align-items: center;
+    gap: 15px; /* Ajusta o espaçamento quando em coluna */
+  }
+
+  .link {
+    width: 100%; /* Faz cada link ocupar a largura total quando em coluna */
+    text-align: center;
+  }
+}

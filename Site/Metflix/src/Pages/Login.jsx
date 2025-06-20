@@ -1,52 +1,90 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useDatabase } from '../Hooks/useDatabase'; // Supondo que você tem esse hook
+import { useNavigate, Link } from 'react-router-dom';
+import axios from 'axios'; // Você já está usando axios, então vamos mantê-lo
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const { query } = useDatabase(); // Simulação, a validação de senha seria no backend
-  const navigate = useNavigate();
+    const navigate = useNavigate();
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    try {
-      // ATENÇÃO: A verificação de senha deve ser feita no backend com bcrypt.
-      // Aqui, faremos uma busca simples apenas para o propósito do projeto da faculdade.
-      const users = query('SELECT id_usuario, senha_hash FROM Usuarios WHERE email = ?', [email]);
-      
-      if (users.length > 0) {
-        // Em um app real: if (bcrypt.compareSync(password, users[0].senha_hash))
-        if (password === users[0].senha_hash) { // Simulação
-            alert('Login bem-sucedido!');
-            const userData = query('SELECT id_usuario, is_admin FROM Usuarios WHERE email = ?', [email]);
-            localStorage.setItem('userId', userData[0].id_usuario);
-            localStorage.setItem('isAdmin', userData[0].is_admin); // Salva o status de admin
-           navigate('/profiles');
-        } else {
-          setError('Email ou senha inválidos.');
+    // Estados para o formulário e para controle de UI
+    const [email, setEmail] = useState('');
+    const [senha, setSenha] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
+
+        if (!email || !senha) {
+            setError('Email e senha são obrigatórios.');
+            setLoading(false);
+            return;
         }
-      } else {
-        setError('Email ou senha inválidos.');
-      }
-    } catch (err) {
-      setError('Ocorreu um erro ao tentar fazer login.');
-      console.error(err);
-    }
-  };
 
-  return (
-    <div style={{ color: 'white', maxWidth: '400px', margin: 'auto', paddingTop: '100px' }}>
-      <h1>Entrar</h1>
-      <form onSubmit={handleLogin}>
-        <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email" style={{ width: '100%', padding: '10px', marginBottom: '10px' }} />
-        <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Senha" style={{ width: '100%', padding: '10px', marginBottom: '10px' }} />
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        <button type="submit" style={{ width: '100%', padding: '10px' }}>Entrar</button>
-      </form>
-    </div>
-  );
+        try {
+            // 1. Faz a chamada para a API de login
+            const response = await axios.post('http://localhost:4000/login', { email, senha });
+
+            // A API de login que fizemos retorna um objeto { mensagem, usuario }
+            const { usuario } = response.data;
+
+            if (usuario && usuario.id_usuario) {
+                // 2. Salva o objeto do usuário inteiro no sessionStorage
+                // O JSON.stringify é crucial para salvar o objeto corretamente
+                sessionStorage.setItem('usuario', JSON.stringify(usuario));
+
+                // 3. Usa o navigate para redirecionar para a seleção de perfil
+                navigate('/selecionar-perfil');
+            } else {
+                // Caso a resposta não venha como esperado
+                throw new Error('Dados de login inválidos recebidos do servidor.');
+            }
+
+        } catch (err) {
+            // Pega a mensagem de erro da resposta da API ou uma mensagem padrão
+            const errorMessage = err.response?.data?.mensagem || err.message || 'Falha no login. Verifique suas credenciais.';
+            setError(errorMessage);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+            <div className="form-container">
+                <h1>Entrar</h1>
+                <form onSubmit={handleLogin}>
+                    <input
+                        type="email"
+                        className="form-input"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Email"
+                        required
+                    />
+                    <input
+                        type="password"
+                        className="form-input"
+                        value={senha}
+                        onChange={(e) => setSenha(e.target.value)}
+                        placeholder="Senha"
+                        required
+                    />
+
+                    {error && <p className="error-message">{error}</p>}
+
+                    <button type="submit" className="form-button" disabled={loading}>
+                        {loading ? 'Entrando...' : 'Entrar'}
+                    </button>
+
+                    <p style={{ color: 'var(--text-secondary)', marginTop: '20px' }}>
+                        Novo por aqui? <Link to="/cadastro">Assine agora.</Link>
+                    </p>
+                </form>
+            </div>
+        </div>
+    );
 };
 
 export default Login;
