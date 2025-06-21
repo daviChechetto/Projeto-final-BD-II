@@ -52,56 +52,53 @@ a:hover {
   color: var(--cor-destaque-hover);
 }
 
+.input-wrapper {
+    position: relative;
+    width: 100%;
+    margin-bottom: 1rem; /* Mova a margem do input para o wrapper */
+}
+
+.input-wrapper::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 0; /* Alinhar com a parte de baixo do wrapper */
+    width: 0;
+    height: 2px;
+    background-color: var(--cor-destaque); /* Cor de destaque ao focar */
+    transition: all 0.3s ease-in-out;
+    transform: translateX(-50%);
+}
+
+/* Ajusta o input para focar o wrapper */
+input:focus ~ .input-wrapper::after,
+.input-wrapper:focus-within::after { /* A mágica acontece com :focus-within */
+    width: 100%;
+    left: 0;
+    transform: translateX(0);
+}
+
+/* Modifique seus inputs */
 input[type="text"],
 input[type="email"],
 input[type="password"] {
-  width: 100%;
-  padding: 12px 5px;
-  margin-bottom: 1rem;
-  background-color: transparent;
-  color: var(--cor-texto-primario);
-  border: none;
-  border-bottom: 2px solid var(--cor-borda);
-  border-radius: 0;
-  font-size: 1rem;
-  transition: border-color 0.3s ease;
-  position: relative;
-  outline: none;
+    width: 100%;
+    padding: 12px 5px;
+    background-color: transparent;
+    color: var(--cor-texto-primario);
+    border: none; /* Remove a borda original */
+    border-bottom: 2px solid var(--cor-borda);
+    border-radius: 0;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+    outline: none; /* Mantém sem outline */
 }
 
-input[type="text"]::placeholder,
-input[type="email"]::placeholder,
-input[type="password"]::placeholder {
-  color: var(--cor-texto-secundario);
-  opacity: 0.7;
-}
-
-input[type="text"]::after,
-input[type="email"]::after,
-input[type="password"]::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  bottom: -2px;
-  width: 0;
-  height: 2px;
-  background-color: var(--cor-texto-primario);
-  transition: all 0.3s ease-in-out;
-  transform: translateX(-50%);
-}
-
-input[type="text"]:focus::after,
-input[type="email"]:focus::after,
-input[type="password"]:focus::after {
-  width: 100%;
-  left: 0;
-  transform: translateX(0);
-}
-
+/* Remove a tentativa de mudar a cor da borda, pois a animação cuidará disso */
 input[type="text"]:focus,
 input[type="email"]:focus,
-input[type="password"]:focus {
-  border-bottom-color: transparent; /* Esconde a borda original para dar espaço à animada */
+input[type-="password"]:focus {
+    border-bottom-color: transparent; 
 }
 
 button {

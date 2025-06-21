@@ -1,20 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../Database/DBConection');
-
-// Função auxiliar para rodar queries 'all' com async/await
-function dbAllAsync(sql, params = []) {
-    return new Promise((resolve, reject) => {
-        db.all(sql, params, (err, rows) => {
-            if (err) {
-                console.error('Erro na consulta db.all:', err.message);
-                reject(err);
-            } else {
-                resolve(rows);
-            }
-        });
-    });
-}
+const { dbAllAsync } = require('../Database/DBhelper');
 
 // Rota para buscar os dados dos planos
 router.get('/planos', async (req, res) => {

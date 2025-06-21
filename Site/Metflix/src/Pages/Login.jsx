@@ -24,17 +24,15 @@ const Login = () => {
 
         try {
             // 1. Faz a chamada para a API de login
-            const response = await axios.post('http://localhost:4000/login', { email, senha });
+            const response = await axios.post('http://localhost:4000/api/login', { email, senha });
 
             // A API de login que fizemos retorna um objeto { mensagem, usuario }
-            const { usuario } = response.data;
+            const { usuario, accessToken } = response.data;
 
-            if (usuario && usuario.id_usuario) {
-                // 2. Salva o objeto do usuário inteiro no sessionStorage
-                // O JSON.stringify é crucial para salvar o objeto corretamente
+            if (usuario && usuario.id_usuario && accessToken) {
+                
                 sessionStorage.setItem('usuario', JSON.stringify(usuario));
-
-                // 3. Usa o navigate para redirecionar para a seleção de perfil
+                sessionStorage.setItem('accessToken', accessToken);
                 navigate('/selecionar-perfil');
             } else {
                 // Caso a resposta não venha como esperado
@@ -57,7 +55,7 @@ const Login = () => {
                 <form onSubmit={handleLogin}>
                     <input
                         type="email"
-                        className="form-input"
+                        className="input-wrapper"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="Email"
@@ -65,7 +63,7 @@ const Login = () => {
                     />
                     <input
                         type="password"
-                        className="form-input"
+                        className="input-wrapper"
                         value={senha}
                         onChange={(e) => setSenha(e.target.value)}
                         placeholder="Senha"

@@ -1,24 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../Database/DBConection');
-
-// Função auxiliar para rodar queries 'all' com async/await
-function dbAllAsync(sql, params = []) {
-    return new Promise((resolve, reject) => {
-        db.all(sql, params, (err, rows) => {
-            if (err) {
-                console.error('Erro na consulta db.all:', err.message);
-                reject(err);
-            } else {
-                resolve(rows);
-            }
-        });
-    });
-}
+const authenticateToken = require('./authMiddleware');
+const { dbAllAsync } = require('../Database/DBhelper');
 
 // Rota para buscar todos os perfis de um usuário específico
 // Exemplo de como chamar: /usuarios/1/perfis
-router.get('/usuarios/:id_usuario/perfis', async (req, res) => {
+router.get('/usuarios/:id_usuario/perfis', authenticateToken, async (req, res) => {
     try {
         const { id_usuario } = req.params;
         const query = 'SELECT id_perfil, nome, avatar_url FROM Perfis WHERE id_usuario = ?';

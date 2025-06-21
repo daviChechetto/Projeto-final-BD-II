@@ -21,7 +21,7 @@ const Cadastro = () => {
     useEffect(() => {
         const fetchPlans = async () => {
             try {
-                const response = await fetch('http://localhost:4000/planos');
+                const response = await fetch('http://localhost:4000/api/planos');
                 if (!response.ok) {
                     throw new Error('Não foi possível carregar os planos.');
                 }
@@ -53,7 +53,7 @@ const Cadastro = () => {
         }
 
         try {
-            const response = await fetch('http://localhost:4000/cadastro', {
+            const response = await fetch('http://localhost:4000/api/cadastro', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

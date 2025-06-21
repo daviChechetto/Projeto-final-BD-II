@@ -2,92 +2,61 @@ const express = require('express');
 const argon2 = require('argon2');
 const router = express.Router();
 const db = require('../Database/DBConection');
-
-function dbGetAsync(sql, params) {
-    return new Promise((resolve, reject) => {
-        db.get(sql, params, (err, row) => {
-            if (err) {
-                console.error('Erro na consulta db.get:', err.message);
-                reject(err);
-            } else {
-                resolve(row);
-            }
-        });
-    });
-}
+const { dbGetAsync, dbRunAsync } = require('../Database/DBhelper');
 
 router.post('/cadastro', async (req, res) => {
-    // Agora esperamos o id_plano e o nome_perfil, como no modelo Netflix.
     const { email, senha, id_plano, nome_perfil } = req.body;
 
-    // Validação dos campos essenciais.
     if (!email || !senha || !id_plano || !nome_perfil) {
         return res.status(400).json({ mensagem: 'Email, senha, plano e nome do perfil são obrigatórios.' });
     }
 
     try {
-        // 1. VERIFICAR SE O EMAIL JÁ EXISTE na tabela Usuarios.
+        // 1. VERIFICAR SE O EMAIL JÁ EXISTE
         const userExists = await dbGetAsync('SELECT email FROM Usuarios WHERE email = ?', [email]);
         if (userExists) {
             return res.status(409).json({ mensagem: 'Este email já está cadastrado.' });
         }
 
-        // 2. VERIFICAR SE O PLANO ESCOLHIDO É VÁLIDO.
+        // 2. VERIFICAR SE O PLANO ESCOLHIDO É VÁLIDO
         const planExists = await dbGetAsync('SELECT id_plano FROM Planos WHERE id_plano = ?', [id_plano]);
         if (!planExists) {
             return res.status(404).json({ mensagem: 'Plano selecionado não é válido.' });
         }
 
-        // 3. GERAR O HASH DA SENHA.
+        // 3. GERAR O HASH DA SENHA
         const senha_hash = await argon2.hash(senha, { type: argon2.argon2id });
+        
+        // 4. INICIAR TRANSAÇÃO MANUALMENTE
+        await dbRunAsync("BEGIN TRANSACTION;");
 
-        // 4. USAR db.serialize PARA EXECUTAR AS OPERAÇÕES EM ORDEM (TRANSAÇÃO).
-        // db.serialize garante que os comandos dentro dela rodem em sequência.
-        db.serialize(async () => {
-            // Inicia a transação
-            db.run("BEGIN TRANSACTION;");
+        // 5. INSERIR USUÁRIO
+        const userInsertSql = `
+            INSERT INTO Usuarios (email, senha_hash, id_plano, data_modificado)
+            VALUES (?, ?, ?, datetime('now'))
+        `;
+        // O resultado do dbRunAsync contém o 'lastID'
+        const userResult = await dbRunAsync(userInsertSql, [email, senha_hash, id_plano]);
+        const newUserId = userResult.lastID;
 
-            const userInsertSql = `
-                INSERT INTO Usuarios (email, senha_hash, id_plano, data_modificado)
-                VALUES (?, ?, ?, datetime('now'))
-            `;
+        // 6. INSERIR PERFIL INICIAL
+        const profileInsertSql = `
+            INSERT INTO Perfis (id_usuario, nome) VALUES (?, ?);
+        `;
+        await dbRunAsync(profileInsertSql, [newUserId, nome_perfil]);
 
-            // Roda o insert do usuário. O 'function(err)' é crucial para obter o 'this.lastID'.
-            db.run(userInsertSql, [email, senha_hash, id_plano], async function(err) {
-                if (err) {
-                    console.error('Erro ao inserir usuário:', err.message);
-                    db.run("ROLLBACK;"); // Desfaz a transação em caso de erro
-                    return res.status(500).json({ mensagem: 'Erro ao criar usuário.' });
-                }
-
-                // 'this.lastID' contém o ID do usuário que acabamos de criar.
-                const newUserId = this.lastID;
-
-                const profileInsertSql = `
-                    INSERT INTO Perfis (id_usuario, nome) VALUES (?, ?);
-                `;
-
-                // Insere o primeiro perfil associado ao novo usuário.
-                db.run(profileInsertSql, [newUserId, nome_perfil], (err) => {
-                    if (err) {
-                        console.error('Erro ao inserir perfil:', err.message);
-                        db.run("ROLLBACK;");
-                        return res.status(500).json({ mensagem: 'Erro ao criar perfil de usuário.' });
-                    }
-
-                    // Se tudo deu certo, comita a transação.
-                    db.run("COMMIT;");
-
-                    // Envia a resposta de sucesso.
-                    return res.status(201).json({
-                        mensagem: 'Usuário e perfil inicial criados com sucesso!',
-                        usuario: { id_usuario: newUserId, email: email }
-                    });
-                });
-            });
+        // 7. SE TUDO DEU CERTO, COMMITAR A TRANSAÇÃO
+        await dbRunAsync("COMMIT;");
+        
+        // 8. ENVIAR RESPOSTA DE SUCESSO
+        return res.status(201).json({
+            mensagem: 'Usuário e perfil inicial criados com sucesso!',
+            usuario: { id_usuario: newUserId, email: email }
         });
 
     } catch (error) {
+        // 9. SE QUALQUER PASSO FALHAR, FAZER ROLLBACK
+        await dbRunAsync("ROLLBACK;");
         console.error('Erro no processo de cadastro:', error);
         return res.status(500).json({ mensagem: 'Erro interno no servidor ao realizar o cadastro.' });
     }

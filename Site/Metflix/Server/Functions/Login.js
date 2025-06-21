@@ -2,30 +2,15 @@ const express = require('express');
 const argon2 = require('argon2');
 const router = express.Router();
 const db = require('../Database/DBConection');
-
-function dbGetAsync(sql, params) {
-    return new Promise((resolve, reject) => {
-        db.get(sql, params, (err, row) => {
-            if (err) reject(err);
-            else resolve(row);
-        });
-    });
-}
-
-function dbAllAsync(sql, params) {
-    return new Promise((resolve, reject) => {
-        db.all(sql, params, (err, rows) => {
-            if (err) reject(err);
-            else resolve(rows);
-        });
-    });
-}     
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
+const { dbGetAsync, dbAllAsync } = require('../Database/DBhelper');  
 
 
 
 router.post('/login', async (req, res) => {
     const { email, senha } = req.body;
-
+    console.log('Dados recebidos para login:', { email, senha });
     if (!email || !senha) {
         return res.status(400).json({ mensagem: 'Email e senha são obrigatórios.' });
     }
@@ -34,7 +19,7 @@ router.post('/login', async (req, res) => {
         // 1. BUSCAR USUÁRIO PELO EMAIL na tabela Usuarios.
         const queryUser = 'SELECT id_usuario, email, senha_hash, is_admin FROM Usuarios WHERE email = ?';
         const userData = await dbGetAsync(queryUser, [email]);
-
+        console.log('Dados do usuário encontrado:', userData);
         // 2. VERIFICAR SE O USUÁRIO EXISTE.
         if (!userData) {
             return res.status(401).json({ mensagem: "Credenciais inválidas." });
@@ -47,6 +32,13 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ mensagem: "Credenciais inválidas." });
         }
 
+        const payload = { 
+            id_usuario: userData.id_usuario, 
+            email: userData.email,
+            is_admin: userData.is_admin 
+        };
+        const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '1d' }); // Token expira em 1 dia
+
         // 4. BUSCAR OS PERFIS ASSOCIADOS A ESSE USUÁRIO.
         const queryProfiles = 'SELECT id_perfil, nome, avatar_url FROM Perfis WHERE id_usuario = ?';
         const perfis = await dbAllAsync(queryProfiles, [userData.id_usuario]);
@@ -54,8 +46,8 @@ router.post('/login', async (req, res) => {
         // 5. RETORNAR RESPOSTA DE SUCESSO com os dados do usuário e seus perfis.
         return res.status(200).json({
             mensagem: "Login bem-sucedido!",
+            accessToken: accessToken,
             usuario: {
-                // Removi o id simples e deixei o id_usuario para consistência
                 id_usuario: userData.id_usuario,
                 email: userData.email,
                 is_admin: userData.is_admin || false,

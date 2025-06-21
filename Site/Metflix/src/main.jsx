@@ -8,6 +8,8 @@ import Cadastro from './Pages/Cadastro.jsx'
 import SelecionarPerfil from './Pages/SelectProfile.jsx'
 import Home from './Pages/Home.jsx'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
+import AdminRoute from './Components/Admin/AdminRoute.jsx'
+import AdminPanel from './Pages/Admin/AdminPanel.jsx'
 
 const router = createBrowserRouter([
   {
@@ -16,20 +18,30 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />
   },
   {
-    path: '/Login',
+    path: '/login',
     element: <Login />
   },
   {
-    path:'/Cadastro',
+    path:'/cadastro',
     element: <Cadastro/>
   },
   {
-    path: '/Selecionar-Perfil',
+    path: '/selecionar-perfil',
     element: <SelecionarPerfil/>
   },
   {
-    path: '/Home',
+    path: '/home',
     element: <Home/>
+  },
+  {
+    path: '/admin',
+    element: <AdminRoute />,
+    children: [
+      {
+        path: 'panel', 
+        element: <AdminPanel />
+      },
+    ]
   }
 ])
 
