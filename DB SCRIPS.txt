@@ -1,85 +1,101 @@
 SCRIPTS DE CRIAÇÃO DAS TABELAS
 
 CREATE TABLE Planos (
-    id_plano SERIAL PRIMARY KEY,
+    -- Em SQLite, a sintaxe correta para autoincremento é 'INTEGER PRIMARY KEY AUTOINCREMENT'.
+    id_plano INTEGER PRIMARY KEY AUTOINCREMENT,
     nome VARCHAR(100) NOT NULL,
     preco NUMERIC(10, 2) NOT NULL,
     qualidade_max VARCHAR(50),
     telas_max INT NOT NULL
 );
 
+-- Tabela de Usuários
 CREATE TABLE Usuarios (
-    id_usuario AUTOINCREMENT PRIMARY KEY,
+    id_usuario INTEGER PRIMARY KEY AUTOINCREMENT,
     email VARCHAR(255) UNIQUE NOT NULL,
-    senha_hash VARCHAR(255) NOT NULL, -- Lembre-se de nunca salvar senhas em texto puro!
+    senha_hash VARCHAR(255) NOT NULL,
     id_plano INT NOT NULL,
     status VARCHAR(50) DEFAULT 'active',
-    data_criado TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    data_modificado TIMESTAMP WITH TIME ZONE,
-    CONSTRAINT fk_plano FOREIGN KEY(id_plano) REFERENCES Planos(id_plano),
-    is_admin boolean
+    -- SQLite não possui o tipo TIMESTAMP WITH TIME ZONE. Usa-se TEXT, REAL ou INTEGER.
+    -- CURRENT_TIMESTAMP armazena a data/hora em UTC no formato 'YYYY-MM-DD HH:MM:SS'.
+    data_criado TEXT DEFAULT CURRENT_TIMESTAMP,
+    data_modificado TEXT,
+    is_admin BOOLEAN,
+    CONSTRAINT fk_plano FOREIGN KEY(id_plano) REFERENCES Planos(id_plano)
 );
 
+-- Tabela de Perfis de Usuário
 CREATE TABLE Perfis (
-    id_perfil AUTOINCREMENT PRIMARY KEY,
+    id_perfil INTEGER PRIMARY KEY AUTOINCREMENT,
     id_usuario INT NOT NULL,
     nome VARCHAR(100) NOT NULL,
-    avatar_url VARCHAR(255),
-    CONSTRAINT fk_usuario FOREIGN KEY(id_usuario) REFERENCES Usuarios(id_usuario) ON DELETE CASCADE -- Se o usuário for deletado, seus perfis também são.
+    avatar_url VARCHAR(255), -- Pode ser nulo; um gatilho cuidará do valor padrão.
+    -- ON DELETE CASCADE garante que os perfis sejam deletados se o usuário for removido.
+    CONSTRAINT fk_usuario FOREIGN KEY(id_usuario) REFERENCES Usuarios(id_usuario) ON DELETE CASCADE
 );
 
 CREATE TABLE Generos (
-    id_genero AUTOINCREMENT PRIMARY KEY,
+    id_genero INTEGER PRIMARY KEY AUTOINCREMENT,
     nome VARCHAR(100) UNIQUE NOT NULL
 );
 
+-- Tabela de Conteúdos (Filmes e Séries)
 CREATE TABLE Conteudos (
-    id_conteudo AUTOINCREMENT PRIMARY KEY,
+    id_conteudo INTEGER PRIMARY KEY AUTOINCREMENT,
     titulo VARCHAR(255) NOT NULL,
     descricao TEXT,
     ano_lancamento INT,
     duracao_min INT, -- Para filmes. Nulo para séries.
-    tipo_conteudo content_type_enum NOT NULL,
+    -- Substituindo o tipo ENUM (não existe no SQLite) por TEXT com uma restrição CHECK.
+    tipo_conteudo TEXT NOT NULL CHECK(tipo_conteudo IN ('filme', 'serie')),
     thumbnail_url VARCHAR(255)
 );
 
+-- Tabela de Episódios para as Séries
 CREATE TABLE Episodios (
-    id_episodio AUTOINCREMENT PRIMARY KEY,
-    id_conteudo INT NOT NULL, -- A série a que o episódio pertence.
+    id_episodio INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_conteudo INT NOT NULL, -- FK para a tabela Conteudos (a série)
     titulo VARCHAR(255) NOT NULL,
     numero_temporada INT NOT NULL,
     numero_episodio INT NOT NULL,
     duracao_min INT,
     video_url VARCHAR(255),
     CONSTRAINT fk_conteudo FOREIGN KEY(id_conteudo) REFERENCES Conteudos(id_conteudo) ON DELETE CASCADE,
-    UNIQUE(id_conteudo, numero_temporada, numero_episodio) -- Garante que não haja episódios duplicados na mesma temporada.
+    -- Garante que não haja episódios duplicados na mesma temporada.
+    UNIQUE(id_conteudo, numero_temporada, numero_episodio)
 );
 
+-- Tabela de Associação entre Conteúdos e Gêneros
 CREATE TABLE Conteudo_Genero (
     id_conteudo INT NOT NULL,
     id_genero INT NOT NULL,
     CONSTRAINT fk_conteudo FOREIGN KEY(id_conteudo) REFERENCES Conteudos(id_conteudo) ON DELETE CASCADE,
-    CONSTRAINT fk_genero FOREIGN KEY(id_genero) REFERENCES Generos(id_genero) ON DELETE RESTRICT, -- Evita apagar um gênero que está em uso.
-    PRIMARY KEY(id_conteudo, id_genero) -- Chave primária composta.
+    -- ON DELETE RESTRICT é o comportamento padrão no SQLite, mas pode ser explícito.
+    CONSTRAINT fk_genero FOREIGN KEY(id_genero) REFERENCES Generos(id_genero) ON DELETE RESTRICT,
+    PRIMARY KEY(id_conteudo, id_genero)
 );
 
+-- Tabela "Minha Lista" para cada Perfil
 CREATE TABLE Minha_Lista (
-    id_minha_lista AUTOINCREMENT PRIMARY KEY,
+    id_minha_lista INTEGER PRIMARY KEY AUTOINCREMENT,
     id_perfil INT NOT NULL,
     id_conteudo INT NOT NULL,
-    data_adicao TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    data_adicao TEXT DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_perfil FOREIGN KEY(id_perfil) REFERENCES Perfis(id_perfil) ON DELETE CASCADE,
     CONSTRAINT fk_conteudo FOREIGN KEY(id_conteudo) REFERENCES Conteudos(id_conteudo) ON DELETE CASCADE,
-    UNIQUE(id_perfil, id_conteudo) -- Um perfil não pode ter o mesmo item duas vezes na lista.
+    -- Garante que um item não possa ser adicionado duas vezes na lista do mesmo perfil.
+    UNIQUE(id_perfil, id_conteudo)
 );
 
+-- Tabela de Histórico de Visualização
 CREATE TABLE Historicos (
-    id_historico AUTOINCREMENT PRIMARY KEY,
+    id_historico INTEGER PRIMARY KEY AUTOINCREMENT,
     id_perfil INT NOT NULL,
     id_conteudo INT NOT NULL,
-    id_episodio INT, -- Nulo se for um filme.
+    id_episodio INT,
     progresso_seg INT NOT NULL DEFAULT 0,
-    data_visualizacao TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    data_visualizacao TEXT DEFAULT CURRENT_TIMESTAMP,
+    
     CONSTRAINT fk_perfil FOREIGN KEY(id_perfil) REFERENCES Perfis(id_perfil) ON DELETE CASCADE,
     CONSTRAINT fk_conteudo FOREIGN KEY(id_conteudo) REFERENCES Conteudos(id_conteudo) ON DELETE CASCADE,
     CONSTRAINT fk_episodio FOREIGN KEY(id_episodio) REFERENCES Episodios(id_episodio) ON DELETE CASCADE
@@ -202,7 +218,21 @@ CREATE INDEX idx_minha_lista_id_perfil ON Minha_Lista(id_perfil);
 
 CREATE INDEX idx_historicos_id_perfil ON Historicos(id_perfil);
 CREATE INDEX idx_historicos_id_conteudo ON Historicos(id_conteudo);
+CREATE UNIQUE INDEX idx_unique_historico_filme ON Historicos(id_perfil, id_conteudo) WHERE id_episodio IS NULL;
+CREATE UNIQUE INDEX idx_unique_historico_serie ON Historicos(id_perfil, id_conteudo, id_episodio) WHERE id_episodio IS NOT NULL;
 
+SCRIPTS TRIGGERS
+
+//set avatar_url baseado no nome
+CREATE TRIGGER set_default_avatar
+AFTER INSERT ON Perfis
+FOR EACH ROW
+WHEN NEW.avatar_url IS NULL
+BEGIN
+    UPDATE Perfis
+    SET avatar_url = 'https://placehold.co/200x200/EBF4FF/76A9EA?text=' || UPPER(SUBSTR(NEW.nome, 1, 1))
+    WHERE id_perfil = NEW.id_perfil;
+END;
 
 
 
