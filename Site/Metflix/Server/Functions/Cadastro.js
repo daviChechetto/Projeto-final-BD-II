@@ -13,13 +13,13 @@ router.post('/cadastro', async (req, res) => {
 
     try {
         // 1. VERIFICAR SE O EMAIL JÁ EXISTE
-        const userExists = await dbGetAsync('SELECT email FROM Usuarios WHERE email = ?', [email]);
+        const userExists = dbGetAsync('SELECT email FROM Usuarios WHERE email = ?', [email]);
         if (userExists) {
             return res.status(409).json({ mensagem: 'Este email já está cadastrado.' });
         }
 
         // 2. VERIFICAR SE O PLANO ESCOLHIDO É VÁLIDO
-        const planExists = await dbGetAsync('SELECT id_plano FROM Planos WHERE id_plano = ?', [id_plano]);
+        const planExists = dbGetAsync('SELECT id_plano FROM Planos WHERE id_plano = ?', [id_plano]);
         if (!planExists) {
             return res.status(404).json({ mensagem: 'Plano selecionado não é válido.' });
         }
@@ -28,7 +28,7 @@ router.post('/cadastro', async (req, res) => {
         const senha_hash = await argon2.hash(senha, { type: argon2.argon2id });
         
         // 4. INICIAR TRANSAÇÃO MANUALMENTE
-        await dbRunAsync("BEGIN TRANSACTION;");
+        dbRunAsync("BEGIN TRANSACTION;");
 
         // 5. INSERIR USUÁRIO
         const userInsertSql = `
@@ -36,17 +36,17 @@ router.post('/cadastro', async (req, res) => {
             VALUES (?, ?, ?, datetime('now'))
         `;
         // O resultado do dbRunAsync contém o 'lastID'
-        const userResult = await dbRunAsync(userInsertSql, [email, senha_hash, id_plano]);
+        const userResult = dbRunAsync(userInsertSql, [email, senha_hash, id_plano]);
         const newUserId = userResult.lastID;
 
         // 6. INSERIR PERFIL INICIAL
         const profileInsertSql = `
             INSERT INTO Perfis (id_usuario, nome) VALUES (?, ?);
         `;
-        await dbRunAsync(profileInsertSql, [newUserId, nome_perfil]);
+         dbRunAsync(profileInsertSql, [newUserId, nome_perfil]);
 
         // 7. SE TUDO DEU CERTO, COMMITAR A TRANSAÇÃO
-        await dbRunAsync("COMMIT;");
+         dbRunAsync("COMMIT;");
         
         // 8. ENVIAR RESPOSTA DE SUCESSO
         return res.status(201).json({
@@ -56,7 +56,7 @@ router.post('/cadastro', async (req, res) => {
 
     } catch (error) {
         // 9. SE QUALQUER PASSO FALHAR, FAZER ROLLBACK
-        await dbRunAsync("ROLLBACK;");
+         dbRunAsync("ROLLBACK;");
         console.error('Erro no processo de cadastro:', error);
         return res.status(500).json({ mensagem: 'Erro interno no servidor ao realizar o cadastro.' });
     }

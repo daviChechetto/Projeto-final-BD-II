@@ -10,6 +10,9 @@ const login = require('./Functions/Login');
 const planos = require('./Functions/Planos')
 const perfis = require('./Functions/Perfis')
 const conteudos = require('./Functions/Admin/Conteudos')
+const historico = require('./Functions/Historico');
+const interacoes = require('./Functions/Interacoes');
+
 app.use(express.json());
 app.use(cors());
 
@@ -18,6 +21,8 @@ app.use('/api', login);
 app.use('/api', conteudos)
 app.use('/api', planos)
 app.use('/api', perfis)
+app.use('/api', historico);
+app.use('/api', interacoes);
 
 const port = 4000;
 app.listen(port, '0.0.0.0', () => {

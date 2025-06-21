@@ -6,7 +6,7 @@ const { dbAllAsync } = require('../Database/DBhelper');
 // Rota para buscar os dados dos planos
 router.get('/planos', async (req, res) => {
     try {
-        const plans = await dbAllAsync('SELECT id_plano, nome, preco, qualidade_max, telas_max FROM Planos ORDER BY preco;');
+        const plans = dbAllAsync('SELECT id_plano, nome, preco, qualidade_max, telas_max FROM Planos ORDER BY preco;');
         res.status(200).json(plans);
     } catch (error) {
         console.error('Erro ao buscar planos:', error);

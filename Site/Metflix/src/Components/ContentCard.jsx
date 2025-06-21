@@ -1,6 +1,8 @@
+// src/Components/ContentCard.jsx
 import React from 'react';
 
-const ContentCard = ({ content }) => {
+// Agora o card recebe as funções de clique como props
+const ContentCard = ({ content, onAddToMyList, onPlay }) => {
     return (
         <div className="card">
             <img
@@ -8,7 +10,17 @@ const ContentCard = ({ content }) => {
                 alt={content.titulo}
                 onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/180x270/1C1C21/A9A9A9?text=Erro' }}
             />
-            <h4>{content.titulo}</h4>
+            <div className="card-overlay">
+                <h4>{content.titulo}</h4>
+                <div className="card-actions">
+                    <button onClick={() => onAddToMyList(content.id_conteudo)} title="Adicionar ou remover da Minha Lista">
+                        +
+                    </button>
+                    <button onClick={() => onPlay(content.id_conteudo)} title="Assistir">
+                        ▶
+                    </button>
+                </div>
+            </div>
         </div>
     );
 };

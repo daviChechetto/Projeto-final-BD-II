@@ -1,42 +1,60 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+// src/Components/Navbar.jsx
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Navbar = ({ perfil }) => {
     const [isAdmin, setIsAdmin] = useState(false);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const navigate = useNavigate();
+    const dropdownRef = useRef(null);
 
     useEffect(() => {
-        // Pega os dados do usuário para verificar se é admin
         const usuarioString = sessionStorage.getItem('usuario');
         if (usuarioString) {
             const usuario = JSON.parse(usuarioString);
             setIsAdmin(usuario.is_admin);
         }
+
+        // Fecha o dropdown se clicar fora dele
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
+
+    const handleLogout = () => {
+        sessionStorage.clear();
+        navigate('/login');
+    };
 
     return (
         <nav className="navbar">
             <div className="nav-left">
                 <Link to="/home" className="logo">CLONEFLIX</Link>
                 <Link to="/home" className="nav-link">Início</Link>
-                <Link to="#" className="nav-link">Minha Lista</Link>
-                <Link to="#" className="nav-link">Séries</Link>
-                <Link to="#" className="nav-link">Filmes</Link>
-
                 {isAdmin && (
-                    <Link to="/admin/panel" className="nav-link" style={{ color: 'var(--cor-destaque)' }}>
-                        Painel Admin
-                    </Link>
+                    <Link to="/admin" className="nav-link admin-link">Painel Admin</Link>
                 )}
             </div>
-            
-            <div className="nav-right">
-                <Link style={{marginRight:"10px"}} to="/login">Sair</Link>
+            <div className="nav-right" ref={dropdownRef}>
                 {perfil && (
                     <img
                         src={perfil.avatar_url || `https://placehold.co/40x40/EBF4FF/76A9EA?text=${perfil.nome.charAt(0)}`}
                         alt={`Avatar de ${perfil.nome}`}
                         className="profile-icon"
+                        onClick={() => setDropdownOpen(!dropdownOpen)}
                     />
+                )}
+                {dropdownOpen && (
+                    <div className="profile-dropdown">
+                        <Link to="/minha-lista" className="dropdown-item" onClick={() => setDropdownOpen(false)}>Minha Lista</Link>
+                        <Link to="/historico" className="dropdown-item" onClick={() => setDropdownOpen(false)}>Histórico</Link>
+                        <div className="dropdown-divider"></div>
+                        <a href="#" onClick={handleLogout} className="dropdown-item">Sair</a>
+                    </div>
                 )}
             </div>
         </nav>

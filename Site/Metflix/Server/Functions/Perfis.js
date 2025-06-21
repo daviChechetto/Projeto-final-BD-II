@@ -10,7 +10,7 @@ router.get('/usuarios/:id_usuario/perfis', authenticateToken, async (req, res) =
     try {
         const { id_usuario } = req.params;
         const query = 'SELECT id_perfil, nome, avatar_url FROM Perfis WHERE id_usuario = ?';
-        const perfis = await dbAllAsync(query, [id_usuario]);
+        const perfis = dbAllAsync(query, [id_usuario]);
 
         if (!perfis) {
             return res.status(404).json({ mensagem: 'Nenhum perfil encontrado para este usuário.' });

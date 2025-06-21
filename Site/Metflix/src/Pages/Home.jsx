@@ -14,6 +14,10 @@ const Home = () => {
     const [contentRows, setContentRows] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [toast, setToast] = useState({ show: false, message: '' });
+
+    const token = sessionStorage.getItem('accessToken');
+    const API_URL = 'http://localhost:4000/api';
 
     useEffect(() => {
         const perfilData = sessionStorage.getItem('perfilAtivo');
@@ -42,6 +46,48 @@ const Home = () => {
 
         fetchBrowseData();
     }, [navigate]);
+
+    const showToast = (message) => {
+        setToast({ show: true, message });
+        setTimeout(() => setToast({ show: false, message: '' }), 3000);
+    };
+
+    const handleAddToMyList = async (id_conteudo) => {
+        if (!perfilAtivo) return;
+        try {
+            const response = await fetch(`${API_URL}/perfis/${perfilAtivo.id_perfil}/minha-lista`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ id_conteudo })
+            });
+            const data = await response.json();
+            showToast(data.mensagem); // Mostra o feedback da API
+        } catch (err) {
+            showToast('Erro ao adicionar à lista.');
+        }
+    };
+
+    const handlePlay = async (id_conteudo) => {
+        if (!perfilAtivo) return;
+        try {
+            await fetch(`${API_URL}/perfis/${perfilAtivo.id_perfil}/historico`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ id_conteudo })
+            });
+            showToast('Adicionado ao seu histórico!');
+            // Aqui você poderia navegar para uma página de player de vídeo
+            // navigate(`/watch/${id_conteudo}`);
+        } catch (err) {
+            showToast('Erro ao registrar no histórico.');
+        }
+    };
 
     if (loading) {
         return <div className="spinner">Carregando...</div>;
@@ -77,6 +123,8 @@ const Home = () => {
                         key={row.title}
                         title={row.title}
                         contents={row.contents} 
+                        onAddToMyList={handleAddToMyList}
+                        onPlay={handlePlay}
                     />
                 ))}
             </main>

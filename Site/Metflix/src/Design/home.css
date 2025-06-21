@@ -53,6 +53,49 @@
     align-items: center;
 }
 
+/* Adicione estas classes ao seu arquivo Home.css ou um CSS específico do Navbar */
+
+.navbar .admin-link {
+    color: var(--cor-destaque);
+    font-weight: bold;
+}
+
+.nav-right {
+    position: relative;
+}
+
+.profile-dropdown {
+    position: absolute;
+    top: 55px; /* Posição abaixo do avatar */
+    right: 0;
+    background-color: rgba(20, 20, 20, 0.9);
+    border: 1px solid #333;
+    border-radius: 4px;
+    width: 180px;
+    z-index: 110;
+    overflow: hidden;
+}
+
+.dropdown-item {
+    display: block;
+    padding: 12px 15px;
+    color: var(--cor-texto-primario);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background-color: var(--cor-destaque-hover);
+    color: var(--cor-primaria);
+}
+
+.dropdown-divider {
+    height: 1px;
+    background-color: #333;
+    margin: 5px 0;
+}
+
 .profile-icon {
     width: 40px;
     height: 40px;
@@ -160,12 +203,67 @@
     display: none;
 }
 
-/* Card de Conteúdo */
+/* Adicione ou modifique estas classes no seu Home.css */
+
 .card {
-    flex: 0 0 180px; /* Não cresce, não encolhe, base de 180px */
+    position: relative; /* Necessário para o overlay */
+    flex: 0 0 180px;
     transition: transform 0.3s ease;
     cursor: pointer;
+    border-radius: 6px;
+    overflow: hidden; /* Esconde o que sair do card */
 }
+
+/* O overlay que aparece ao passar o mouse */
+.card-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+    padding: 15px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.card:hover .card-overlay {
+    opacity: 1;
+}
+
+.card-overlay h4 {
+    font-size: 1rem;
+    color: #fff;
+    margin: 0 0 10px 0;
+}
+
+.card-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.card-actions button {
+    background-color: rgba(40, 40, 40, 0.8);
+    border: 1px solid #fff;
+    color: #fff;
+    border-radius: 50%; /* Botões redondos */
+    width: 36px;
+    height: 36px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.card-actions button:hover {
+    background-color: #fff;
+    color: #000;
+}
+
 
 .card:hover {
     transform: scale(1.08);

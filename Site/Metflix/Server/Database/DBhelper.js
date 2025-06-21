@@ -1,30 +1,23 @@
+// Server/Database/DBhelper.js
+
 const db = require('./DBConection');
 
+// As funções agora são síncronas, não precisam mais de 'Async' no nome
+
 function dbGetAsync(sql, params = []) {
-    return new Promise((resolve, reject) => {
-        db.get(sql, params, (err, row) => {
-            if (err) reject(err);
-            else resolve(row);
-        });
-    });
+    // Prepara a query e executa .get()
+    return db.prepare(sql).get(params);
 }
 
 function dbAllAsync(sql, params = []) {
-    return new Promise((resolve, reject) => {
-        db.all(sql, params, (err, rows) => {
-            if (err) reject(err);
-            else resolve(rows);
-        });
-    });
+    // Prepara a query e executa .all()
+    return db.prepare(sql).all(params);
 }
 
 function dbRunAsync(sql, params = []) {
-    return new Promise((resolve, reject) => {
-        db.run(sql, params, function(err) {
-            if (err) reject(err);
-            else resolve(this);
-        });
-    });
+    // Prepara a query e executa .run()
+    // Retorna um objeto com { changes, lastInsertRowid }
+    return db.prepare(sql).run(params);
 }
 
 module.exports = {

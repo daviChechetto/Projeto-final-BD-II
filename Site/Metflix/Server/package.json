@@ -2,6 +2,6 @@
   "name": "meu-backend",
   "version": "1.0.0",
   "scripts": {
-    "start": "nodemon server.js" 
-}
+    "start": "nodemon server.js"
+  }
 }

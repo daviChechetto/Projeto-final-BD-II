@@ -18,7 +18,7 @@ router.post('/login', async (req, res) => {
     try {
         // 1. BUSCAR USUÁRIO PELO EMAIL na tabela Usuarios.
         const queryUser = 'SELECT id_usuario, email, senha_hash, is_admin FROM Usuarios WHERE email = ?';
-        const userData = await dbGetAsync(queryUser, [email]);
+        const userData = dbGetAsync(queryUser, [email]);
         console.log('Dados do usuário encontrado:', userData);
         // 2. VERIFICAR SE O USUÁRIO EXISTE.
         if (!userData) {
@@ -26,7 +26,7 @@ router.post('/login', async (req, res) => {
         }
 
         // 3. VERIFICAR A SENHA com argon2.
-        const senhaValida = await argon2.verify(userData.senha_hash, senha);
+        const senhaValida = argon2.verify(userData.senha_hash, senha);
 
         if (!senhaValida) {
             return res.status(401).json({ mensagem: "Credenciais inválidas." });
@@ -41,7 +41,7 @@ router.post('/login', async (req, res) => {
 
         // 4. BUSCAR OS PERFIS ASSOCIADOS A ESSE USUÁRIO.
         const queryProfiles = 'SELECT id_perfil, nome, avatar_url FROM Perfis WHERE id_usuario = ?';
-        const perfis = await dbAllAsync(queryProfiles, [userData.id_usuario]);
+        const perfis = dbAllAsync(queryProfiles, [userData.id_usuario]);
 
         // 5. RETORNAR RESPOSTA DE SUCESSO com os dados do usuário e seus perfis.
         return res.status(200).json({

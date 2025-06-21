@@ -10,6 +10,8 @@ import Home from './Pages/Home.jsx'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import AdminRoute from './Components/Admin/AdminRoute.jsx'
 import AdminPanel from './Pages/Admin/AdminPanel.jsx'
+import MinhaLista from './Pages/MinhaLista.jsx'
+import Historico from './Pages/Historico.jsx'
 
 const router = createBrowserRouter([
   {
@@ -32,6 +34,14 @@ const router = createBrowserRouter([
   {
     path: '/home',
     element: <Home/>
+  },
+  {
+    path: '/minha-lista',
+    element: <MinhaLista />
+  },
+  {
+    path: '/historico',
+    element: <Historico />
   },
   {
     path: '/admin',
