@@ -9,7 +9,7 @@ CREATE TABLE Planos (
 );
 
 CREATE TABLE Usuarios (
-    id_usuario SERIAL PRIMARY KEY,
+    id_usuario AUTOINCREMENT PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,
     senha_hash VARCHAR(255) NOT NULL, -- Lembre-se de nunca salvar senhas em texto puro!
     id_plano INT NOT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE Usuarios (
 );
 
 CREATE TABLE Perfis (
-    id_perfil SERIAL PRIMARY KEY,
+    id_perfil AUTOINCREMENT PRIMARY KEY,
     id_usuario INT NOT NULL,
     nome VARCHAR(100) NOT NULL,
     avatar_url VARCHAR(255),
@@ -29,12 +29,12 @@ CREATE TABLE Perfis (
 );
 
 CREATE TABLE Generos (
-    id_genero SERIAL PRIMARY KEY,
+    id_genero AUTOINCREMENT PRIMARY KEY,
     nome VARCHAR(100) UNIQUE NOT NULL
 );
 
 CREATE TABLE Conteudos (
-    id_conteudo SERIAL PRIMARY KEY,
+    id_conteudo AUTOINCREMENT PRIMARY KEY,
     titulo VARCHAR(255) NOT NULL,
     descricao TEXT,
     ano_lancamento INT,
@@ -44,7 +44,7 @@ CREATE TABLE Conteudos (
 );
 
 CREATE TABLE Episodios (
-    id_episodio SERIAL PRIMARY KEY,
+    id_episodio AUTOINCREMENT PRIMARY KEY,
     id_conteudo INT NOT NULL, -- A série a que o episódio pertence.
     titulo VARCHAR(255) NOT NULL,
     numero_temporada INT NOT NULL,
@@ -64,7 +64,7 @@ CREATE TABLE Conteudo_Genero (
 );
 
 CREATE TABLE Minha_Lista (
-    id_minha_lista SERIAL PRIMARY KEY,
+    id_minha_lista AUTOINCREMENT PRIMARY KEY,
     id_perfil INT NOT NULL,
     id_conteudo INT NOT NULL,
     data_adicao TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -74,7 +74,7 @@ CREATE TABLE Minha_Lista (
 );
 
 CREATE TABLE Historicos (
-    id_historico SERIAL PRIMARY KEY,
+    id_historico AUTOINCREMENT PRIMARY KEY,
     id_perfil INT NOT NULL,
     id_conteudo INT NOT NULL,
     id_episodio INT, -- Nulo se for um filme.
