@@ -4,7 +4,7 @@ const router = express.Router();
 const db = require('../Database/DBConection');
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
-const { dbGetAsync, dbAllAsync } = require('../Database/DBhelper');  
+const { dbGet, dbAll } = require('../Database/DBhelper');  
 
 
 
@@ -18,7 +18,7 @@ router.post('/login', async (req, res) => {
     try {
         // 1. BUSCAR USUÁRIO PELO EMAIL na tabela Usuarios.
         const queryUser = 'SELECT id_usuario, email, senha_hash, is_admin FROM Usuarios WHERE email = ?';
-        const userData = dbGetAsync(queryUser, [email]);
+        const userData = dbGet(queryUser, [email]);
         console.log('Dados do usuário encontrado:', userData);
         // 2. VERIFICAR SE O USUÁRIO EXISTE.
         if (!userData) {
@@ -41,7 +41,7 @@ router.post('/login', async (req, res) => {
 
         // 4. BUSCAR OS PERFIS ASSOCIADOS A ESSE USUÁRIO.
         const queryProfiles = 'SELECT id_perfil, nome, avatar_url FROM Perfis WHERE id_usuario = ?';
-        const perfis = dbAllAsync(queryProfiles, [userData.id_usuario]);
+        const perfis = dbAll(queryProfiles, [userData.id_usuario]);
 
         // 5. RETORNAR RESPOSTA DE SUCESSO com os dados do usuário e seus perfis.
         return res.status(200).json({

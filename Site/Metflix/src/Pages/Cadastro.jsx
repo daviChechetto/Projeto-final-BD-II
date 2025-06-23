@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link   } from 'react-router-dom';
 
 import '../Design/main.css'
 
@@ -120,13 +120,14 @@ const Cadastro = () => {
                     
                     <label htmlFor="plan-select" style={{ marginBottom: '8px', color: 'var(--text-secondary)'}}>Selecione um Plano:</label>
                     <select
+                        style={{marginTop:"10px"}}
                         id="plan-select"
                         className="form-select"
                         value={selectedPlan}
                         onChange={(e) => setSelectedPlan(e.target.value)}
                     >
                         {plans.map(plan => (
-                            <option key={plan.id_plano} value={plan.id_plano}>
+                            <option  key={plan.id_plano} value={plan.id_plano}>
                                 {plan.nome} - R$ {plan.preco} ({plan.qualidade_max})
                             </option>
                         ))}
@@ -135,7 +136,7 @@ const Cadastro = () => {
                     {error && <p className="error-message">{error}</p>}
                     {success && <p style={{ color: 'lightgreen', marginBottom: '10px' }}>{success}</p>}
 
-                    <button type="submit" className="form-button">Cadastrar</button>
+                    <button style={{marginTop:"10px"}} type="submit" className="form-button">Cadastrar</button>
 
                     <p style={{ color: 'var(--text-secondary)', marginTop: '20px' }}>
                         Já tem uma conta? <Link to="/login">Faça login agora.</Link>

@@ -6,6 +6,7 @@ const ContentCard = ({ content, onAddToMyList, onPlay }) => {
     return (
         <div className="card">
             <img
+                style={{objectFit:"cover"}}
                 src={content.thumbnail_url || 'https://placehold.co/180x270/1C1C21/A9A9A9?text=Sem+Imagem'}
                 alt={content.titulo}
                 onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/180x270/1C1C21/A9A9A9?text=Erro' }}

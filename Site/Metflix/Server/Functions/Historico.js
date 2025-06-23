@@ -1,7 +1,7 @@
 // Server/Functions/Historico.js
 const express = require('express');
 const router = express.Router();
-const { dbAllAsync } = require('../Database/DBhelper');
+const { dbAll } = require('../Database/DBhelper');
 const authenticateToken = require('./authMiddleware');
 
 // Rota para pegar o histórico de um perfil, usando a VIEW
@@ -20,7 +20,7 @@ router.get('/perfis/:id_perfil/continuar-assistindo', authenticateToken, (req, r
         // Validação simples para garantir que o usuário só pode ver seu próprio histórico
         // Em um app real, você compararia o id_perfil com os perfis associados ao req.user.id_usuario
         
-        const historico = dbAllAsync(sql, [id_perfil]);
+        const historico = dbAll(sql, [id_perfil]);
         res.json(historico);
     } catch (error) {
         res.status(500).json({ mensagem: 'Erro ao buscar histórico.' });

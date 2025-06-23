@@ -33,11 +33,12 @@ const Navbar = ({ perfil }) => {
     return (
         <nav className="navbar">
             <div className="nav-left">
-                <Link to="/home" className="logo">CLONEFLIX</Link>
+                <Link to="/home" className="logo">METFLIX</Link>
                 <Link to="/home" className="nav-link">Início</Link>
                 {isAdmin && (
-                    <Link to="/admin" className="nav-link admin-link">Painel Admin</Link>
+                    <Link to="/admin/panel" className="nav-link admin-link">Painel Admin</Link>
                 )}
+                <Link to="/login" className="nav-link">Sair</Link>
             </div>
             <div className="nav-right" ref={dropdownRef}>
                 {perfil && (
