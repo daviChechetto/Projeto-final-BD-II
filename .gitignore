@@ -11,6 +11,7 @@ node_modules
 dist
 dist-ssr
 *.local
+Trabalho DB.docx
 
 # Editor directories and files
 .vscode/*
